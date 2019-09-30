@@ -22,6 +22,10 @@
 #include "Engine/TextureRenderTarget2D.h"
 #include "Engine/TextureRenderTargetCube.h"
 #include "Misc/FileHelper.h"
+#include "ImageWriteQueue/Public/ImageWriteQueue.h"
+#include "Json/Public/Serialization/JsonSerializer.h"
+#include "Json/Public/Serialization/JsonWriter.h"
+
 
 #include "SeuratStyle.h"
 #include "SeuratCommands.h"
@@ -34,7 +38,7 @@
 #include "Kismet/GameplayStatics.h"
 #endif // WITH_EDITOR
 
-static const FString kSeuratOutputDir = FPaths::ConvertRelativePathToFull(FPaths::GameIntermediateDir() / "SeuratCapture");
+static const FString kSeuratOutputDir = FPaths::ConvertRelativePathToFull(FPaths::ProjectIntermediateDir() / "SeuratCapture");
 static const int32 kTimerExpirationsPerCapture = 4;
 
 #define LOCTEXT_NAMESPACE "FSeuratModule"
@@ -504,7 +508,28 @@ void FSeuratModule::WriteImage(UTextureRenderTarget2D* InRenderTarget, FString F
 	FString ResultPath;
 	FHighResScreenshotConfig& HighResScreenshotConfig = GetHighResScreenshotConfig();
 	HighResScreenshotConfig.bCaptureHDR = true;
-	HighResScreenshotConfig.SaveImage(Filename, OutBMP, DestSize);
+
+	// Check to see if ImageWriteQueue has been initialised
+	if (!ensureMsgf(HighResScreenshotConfig.ImageWriteQueue, TEXT("Unable to write images unless FHighResScreenshotConfig::Init has been called.")))
+	{
+		return;
+	}
+
+	// Create ImageTask
+	TUniquePtr<FImageWriteTask> ImageTask = MakeUnique<FImageWriteTask>();
+	// Pass bitmap to pixeldata
+	ImageTask->PixelData = MakeUnique<TImagePixelData<FLinearColor>>(DestSize, MoveTemp(OutBMP));
+	// Populate Task with config data
+	HighResScreenshotConfig.PopulateImageTaskParams(*ImageTask);
+	ImageTask->Filename = Filename;
+	// Specify HDR as output format
+	ImageTask->Format = EImageFormat::EXR;
+	// Save the bitmap to disc
+	TFuture<bool> CompletionFuture = HighResScreenshotConfig.ImageWriteQueue->Enqueue(MoveTemp(ImageTask));
+	if (CompletionFuture.IsValid())
+	{
+		CompletionFuture.Wait();
+	}
 }
 
 bool FSeuratModule::SaveStringTextToFile(FString SaveDirectory, FString FileName, FString SaveText, bool AllowOverWriting)

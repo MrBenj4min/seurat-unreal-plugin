@@ -19,7 +19,7 @@
 #include "Dom/JsonObject.h"
 #include "Engine/EngineBaseTypes.h"
 #include "Framework/Commands/UICommandList.h"
-#include "ModuleManager.h"
+#include "Modules/ModuleManager.h"
 #include "HighResScreenshot.h"
 #include "TextureResource.h"
 #include "SceneCaptureSeurat.h"

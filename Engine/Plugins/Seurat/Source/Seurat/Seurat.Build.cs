@@ -19,7 +19,9 @@ public class Seurat : ModuleRules
 {
 	public Seurat(ReadOnlyTargetRules Target) : base(Target)
 	{
-			PublicIncludePaths.AddRange(
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+
+        PublicIncludePaths.AddRange(
 			new string[] {
 				"Seurat/Public"
 				// ... add public include paths required here ...
@@ -57,6 +59,7 @@ public class Seurat : ModuleRules
 				"SlateCore",
 				"Json",
 				"PropertyEditor",
+                "ImageWriteQueue",
 				// ... add private dependencies that you statically link with here ...
 			}
 			);
