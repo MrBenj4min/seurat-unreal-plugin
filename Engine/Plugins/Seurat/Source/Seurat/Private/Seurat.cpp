@@ -197,7 +197,7 @@ void FSeuratModule::Tick(ELevelTick TickType, float DeltaSeconds)
 	{
 		// Write out color data.
 		FString ColorImageName = BaseImageName + "_ColorDepth.exr";
-		WriteImage(ColorCamera->TextureTarget, kSeuratOutputDir / ColorImageName, true);
+		WriteImage(ColorCamera->TextureTarget, OutputDirName / ColorImageName, true);
 
 		if (CurrentSample == Samples.Num())
 		{
@@ -262,6 +262,22 @@ void FSeuratModule::BeginCapture(ASceneCaptureSeurat* InCaptureCamera)
 		return;
 	}
 
+	// Generate save path
+	FString positionSampleString("_unresolved");
+	{
+		const UEnum* enumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EPositionSampleCount"), true);
+		if (enumPtr)
+			positionSampleString = "_" + enumPtr->GetNameStringByValue((int64)ColorCameraActor->SamplesPerFace);
+	}
+	FString captureResolutionString("_unresolved");
+	{
+		const UEnum* enumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("ECaptureResolution"), true);
+		if (enumPtr)
+			captureResolutionString = "_" + enumPtr->GetNameStringByValue((int64)ColorCameraActor->Resolution);
+		
+	}
+	OutputDirName = kSeuratOutputDir + positionSampleString + captureResolutionString;
+
 	// Save initial camera state.
 	InitialPosition = ColorCameraActor->GetActorLocation();
 	InitialRotation = ColorCameraActor->GetActorRotation();
@@ -319,7 +335,7 @@ void FSeuratModule::EndCapture()
 	// From Json array to a string.
 	TSharedPtr<FJsonObject> SeuratManifest = MakeShareable(new FJsonObject());
 	SeuratManifest->SetArrayField("view_groups", ViewGroups);
-	GenerateJson(SeuratManifest, kSeuratOutputDir);
+	GenerateJson(SeuratManifest, OutputDirName);
 	Samples.Empty();
 	ViewGroups.Empty();
 	CurrentSample = -1;

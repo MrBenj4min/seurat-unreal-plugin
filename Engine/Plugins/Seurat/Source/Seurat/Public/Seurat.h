@@ -79,6 +79,7 @@ private:
 	FMatrix WorldFromReferenceCameraMatrixSeurat;
 	// Stores the prefix of all capture output files.
 	FString BaseImageName;
+	FString OutputDirName;
 
 	void WriteImage(UTextureRenderTarget2D* InRenderTarget, FString Filename, bool bClearAlpha);
 	bool SaveStringTextToFile(FString SaveDirectory, FString FileName, FString SaveText, bool AllowOverWriting);
