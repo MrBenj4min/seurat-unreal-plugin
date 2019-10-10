@@ -276,7 +276,9 @@ void FSeuratModule::BeginCapture(ASceneCaptureSeurat* InCaptureCamera)
 			captureResolutionString = "_" + enumPtr->GetNameStringByValue((int64)ColorCameraActor->Resolution);
 		
 	}
-	OutputDirName = kSeuratOutputDir + positionSampleString + captureResolutionString;
+
+	FString actorLabelString = "_" + ColorCameraActor->GetActorLabel();
+	OutputDirName = kSeuratOutputDir + positionSampleString + captureResolutionString + actorLabelString;
 
 	// Save initial camera state.
 	InitialPosition = ColorCameraActor->GetActorLocation();
