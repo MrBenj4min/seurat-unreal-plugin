@@ -33,4 +33,5 @@ public:
 
 private:
 	FReply Capture();
+	FReply ShowHeadBoxBounds();
 };

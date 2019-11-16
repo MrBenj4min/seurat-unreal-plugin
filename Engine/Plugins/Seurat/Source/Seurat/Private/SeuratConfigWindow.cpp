@@ -47,6 +47,17 @@ void SSeuratConfigWindow::Construct(const FArguments& InArgs, ASceneCaptureSeura
 			.VAlign(VAlign_Center)
 			.OnClicked(this, &SSeuratConfigWindow::Capture)
 		]
+		+ SVerticalBox::Slot()
+		.Padding(2.0f)
+		.AutoHeight()
+		[
+			SNew(SButton)
+			.Text(LOCTEXT("Show Bounds", "Show Bounds"))
+			.ToolTipText(LOCTEXT("Show Bounds", "Show Bounds"))
+			.HAlign(HAlign_Center)
+			.VAlign(VAlign_Center)
+			.OnClicked(this, &SSeuratConfigWindow::ShowHeadBoxBounds)
+		]
 	];
 }
 
@@ -56,6 +67,16 @@ FReply SSeuratConfigWindow::Capture()
 	if (SeuratModule != nullptr)
 	{
 		SeuratModule->BeginCapture(Owner);
+	}
+	return FReply::Handled();
+}
+
+FReply SSeuratConfigWindow::ShowHeadBoxBounds()
+{
+	FSeuratModule* SeuratModule = FModuleManager::GetModulePtr<FSeuratModule>("Seurat");
+	if (SeuratModule != nullptr)
+	{
+		SeuratModule->ShowHeadBoxBounds(Owner);
 	}
 	return FReply::Handled();
 }

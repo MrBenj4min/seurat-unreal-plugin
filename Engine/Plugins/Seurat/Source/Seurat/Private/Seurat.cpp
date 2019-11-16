@@ -38,6 +38,9 @@
 #include "Kismet/GameplayStatics.h"
 #endif // WITH_EDITOR
 
+#include "DrawDebugHelpers.h"
+#include "Kismet/KismetSystemLibrary.h"
+
 static const FString kSeuratOutputDir = FPaths::ConvertRelativePathToFull(FPaths::ProjectIntermediateDir() / "SeuratCapture");
 static const int32 kTimerExpirationsPerCapture = 4;
 
@@ -210,6 +213,25 @@ void FSeuratModule::Tick(ELevelTick TickType, float DeltaSeconds)
 	{
 		CaptureSeurat();
 	}
+}
+
+void FSeuratModule::ShowHeadBoxBounds(ASceneCaptureSeurat* InCaptureCamera)
+{
+	if (InCaptureCamera == nullptr)
+		return;
+	
+	UWorld* world = InCaptureCamera->GetWorld();
+	FVector boxPos = InCaptureCamera->GetActorLocation();
+	FVector boxSize = InCaptureCamera->HeadboxSize * 0.5f;
+
+	TArray<AActor*> overlappingActors;
+	TArray<TEnumAsByte<EObjectTypeQuery>> objectTypes;
+	objectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldStatic));
+	TArray<AActor*> actorsToIgnore;
+
+	bool overlap = UKismetSystemLibrary::BoxOverlapActors(world, boxPos, boxSize, objectTypes, nullptr, actorsToIgnore, overlappingActors);
+	FColor color = overlap ? FColor::Red : FColor::Green;
+	DrawDebugBox(world, boxPos, boxSize, color, false, 10.0f, 0, 1);
 }
 
 // Convert a transformation matrix in Unreal coordinate system to Seurat's
