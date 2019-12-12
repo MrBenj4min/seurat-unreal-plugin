@@ -39,7 +39,7 @@ public:
 	void BeginCapture(ASceneCaptureSeurat* InCaptureCamera);
 	void EndCapture();
 	void CancelCapture();
-	void Tick(ELevelTick TickType, float DeltaSeconds);
+	void Tick(UWorld* world, ELevelTick TickType, float DeltaSeconds);
 	void ShowHeadBoxBounds(ASceneCaptureSeurat* InCaptureCamera);
 
 	// Fields related to capture process.

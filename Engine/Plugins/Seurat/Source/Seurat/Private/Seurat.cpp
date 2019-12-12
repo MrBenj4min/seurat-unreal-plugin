@@ -181,7 +181,7 @@ void FSeuratModule::AddToolbarExtension(FToolBarBuilder& Builder)
 {
 }
 
-void FSeuratModule::Tick(ELevelTick TickType, float DeltaSeconds)
+void FSeuratModule::Tick(UWorld* world, ELevelTick TickType, float DeltaSeconds)
 {
 	if (CurrentSample < 0)
 	{
